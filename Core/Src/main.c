@@ -18,7 +18,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "mpu6050.h"
+#include "shell.h"
+#include <string.h>		// Byte and string manipulation
+#include <stdio.h>		// Declares vsnprintf, used in shell_printf
+#include <stdarg.h>		// Standard arguments, machinery for variadic functions.
+#include <stdlib.h>		// Standard library.
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -56,6 +61,15 @@ DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
 
+
+
+// SPI
+volatile uint8_t spi_log_flag = 0;
+
+
+// USART
+//static uint8_t usart_tx_buffer[];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,8 +84,39 @@ static void MX_TIM2_Init(void);
 
 /* USER CODE END PFP */
 
+
+
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/**
+* @brief TIM2 interrupt callback. Signal mpu sample every 1000 ms
+* @retval None
+*/
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+
+	if (htim->Instance == TIM2){
+		if (hi2c1.State == HAL_I2C_STATE_READY){
+			i2c_sample_flag = 1;
+		}
+		else{
+			i2c_overrun_count++;
+		}
+
+	   }
+}
+
+/**
+* @brief I2C DMA receive interrupt call back
+* @retval None
+*/
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c){
+
+	if (hi2c->Instance == I2C1){
+		i2c_frame_ready = 1;
+	}
+}
+
+
 
 /* USER CODE END 0 */
 
@@ -118,11 +163,37 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
+
+	  // Sample MPU6050 every 1000ms
+	  if (i2c_sample_flag){
+		 mpu6050_sample();
+		 i2c_sample_flag = 0;
+	  }
+
+	  // Save received frame bytes in buffer
+	  if (i2c_frame_ready){
+		 for (uint8_t i = 0; i < I2C_RX_FRAME_SIZE; i++){
+			 i2c_rx_buffer[indx++] = i2c_rx[i];
+			 if (indx == I2C_LOG_BUFFER_SIZE){	// Check if frame still fits 512 bytes
+				spi_log_flag = 1;		// Flag SD writing
+				 break;
+			 }
+		 }
+		 i2c_frame_ready = 0;
+	  }
+
+	  // Print overrun error if the timer ticked while the i2c was receiving
+	  if (i2c_overrun_count > 0){
+	      shell_printf("I2C sample overrun: %u!\r\n", i2c_overrun_count);
+	  }
+
+
+
   }
   /* USER CODE END 3 */
 }
+
 
 /**
   * @brief System Clock Configuration

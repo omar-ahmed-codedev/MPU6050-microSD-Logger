@@ -1,0 +1,2 @@
+../Core/Src/mpu6050.c:41:6:mpu6050_sample	1
+../Core/Src/mpu6050.c:52:6:HAL_I2C_ErrorCallback	2
