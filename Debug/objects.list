@@ -1,5 +1,6 @@
 "./Core/Src/main.o"
 "./Core/Src/mpu6050.o"
+"./Core/Src/peripheral_config.o"
 "./Core/Src/shell.o"
 "./Core/Src/stm32f4xx_hal_msp.o"
 "./Core/Src/stm32f4xx_it.o"

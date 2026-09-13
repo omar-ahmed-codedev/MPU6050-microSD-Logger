@@ -20,6 +20,10 @@
 
 #include "stm32f4xx_ll_usart.h"
 
+#include <string.h>		// Byte and string manipulation
+#include <stdio.h>		// Declares vsnprintf, used in shell_printf
+#include <stdarg.h>		// Standard arguments, machinery for variadic functions.
+#include <stdlib.h>		// Standard library.
 /* Variables ---------------------------------------------------------*/
 uint8_t usart_rx_buffer[USART_RX_BUFFER_SIZE];
 char usart_tx_buffer[USART_TX_BUFFER_SIZE];
@@ -34,10 +38,10 @@ void shell_printf(const char *str, ...){
     va_list args;   // A type for handling the arguments represented by ..., it iterates over the additional arguments
     int len;
 
-    while (huart2.gState != HAL_UART_STATE_READY){
+    //while (huart2.gState != HAL_UART_STATE_READY){
         // Wait until UART is ready for another operation after the latest HAL_UART_Transmit_DMA
         // Acceptable because it is only called in the main loop
-    }
+    //}
 
     // Intialize args --> args-> first agrument after str (the last named argument of the function)
     va_start(args, str);        // Gives vsnprint access to the arguments supplied through ...
@@ -51,7 +55,7 @@ void shell_printf(const char *str, ...){
             len = (int) USART_TX_BUFFER_SIZE;
         }
         // Starts the transmission and returns before all the bytes have physically been transmitted.
-        HAL_UART_Transmit_DMA(&huart2,(uint8_t *)usart_tx_buffer, (uint16_t) len);
+        HAL_UART_Transmit(&huart2,(uint8_t *)usart_tx_buffer, (uint16_t) len,100);
     }
 
 }

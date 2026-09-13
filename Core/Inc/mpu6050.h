@@ -25,10 +25,18 @@
 /* Defines ------------------------------------------------------------*/
 #define I2C_RX_FRAME_SIZE	14
 #define I2C_RX_BUFFER_SIZE	128
-#define MPU6050_DATA_START_REG 0x3B
-#define MPU6050_ADDR  0x68
-#define I2C_LOG_BUFFER_SIZE 512
 
+#define MPU6050_LOG_BUFFER_SIZE 512
+
+#define MPU6050_ADDR  			0x68
+#define MPU6050_DATA_START_REG 	0x3B
+
+#define MPU6050_WHO_AM_I_REG      	0x75
+#define MPU6050_PWR_MGMT_1_REG    	0x6B
+#define MPU6050_GYRO_CONFIG_REG   	0x1B
+#define MPU6050_ACCEL_CONFIG_REG  	0x1C
+#define MPU6050_CONFIG_REG			0x1A
+#define MPU6050_SMPLRT_DIV_REG   	0x19
 /* Variables ---------------------------------------------------------*/
 extern I2C_HandleTypeDef hi2c1;
 
@@ -41,7 +49,11 @@ extern uint8_t i2c_rx_buffer[I2C_RX_BUFFER_SIZE];
 extern int i2c_sample_count;
 extern uint16_t indx;
 extern volatile uint32_t i2c_overrun_count;
+extern uint8_t start_timer;
+
 
 /* Functions ------------------------------------------------------------------*/
 void mpu6050_sample(void);
+void mpu6050_init(void);
+
 #endif

@@ -1,2 +1,4 @@
-../Core/Src/mpu6050.c:41:6:mpu6050_sample	16	static
-../Core/Src/mpu6050.c:52:6:HAL_I2C_ErrorCallback	16	static
+../Core/Src/mpu6050.c:43:6:mpu6050_init	40	static
+../Core/Src/mpu6050.c:111:6:mpu6050_sample	24	static
+../Core/Src/mpu6050.c:123:6:HAL_I2C_MemRxCpltCallback	16	static
+../Core/Src/mpu6050.c:135:6:HAL_I2C_ErrorCallback	16	static

@@ -20,10 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
-#include <string.h>		// Byte and string manipulation
-#include <stdio.h>		// Declares vsnprintf, used in shell_printf
-#include <stdarg.h>		// Standard arguments, machinery for variadic functions.
-#include <stdlib.h>		// Standard library.
+
 
 /* Defines ------------------------------------------------------------------*/
 #define USART_RX_BUFFER_SIZE	64
