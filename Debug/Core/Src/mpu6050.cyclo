@@ -1,4 +1,4 @@
 ../Core/Src/mpu6050.c:43:6:mpu6050_init	7
 ../Core/Src/mpu6050.c:111:6:mpu6050_sample	1
-../Core/Src/mpu6050.c:123:6:HAL_I2C_MemRxCpltCallback	2
-../Core/Src/mpu6050.c:135:6:HAL_I2C_ErrorCallback	2
+../Core/Src/mpu6050.c:144:6:HAL_I2C_MemRxCpltCallback	2
+../Core/Src/mpu6050.c:157:6:HAL_I2C_ErrorCallback	2

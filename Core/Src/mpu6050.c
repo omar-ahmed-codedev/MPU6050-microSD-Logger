@@ -26,8 +26,8 @@ extern I2C_HandleTypeDef hi2c1;
 volatile uint8_t i2c_sample_flag = 0;
 volatile uint8_t i2c_frame_ready  = 0;
 
-uint8_t i2c_rx[I2C_RX_FRAME_SIZE];
-uint8_t i2c_rx_buffer[I2C_RX_BUFFER_SIZE];
+uint8_t i2c_rx_buffer[I2C_RX_FRAME_SIZE];
+uint8_t mpu_log_buffer[MPU_LOG_BUFFER_SIZE];
 
 int i2c_sample_count = 0;
 uint16_t indx = 0;
@@ -110,8 +110,29 @@ void mpu6050_init(void){
 */
 void mpu6050_sample(void){
 	// Sensor by defualt updates its registers with 8kHz (DLPF_CFG = 0)
-	HAL_I2C_Mem_Read(&hi2c1, MPU6050_ADDR << 1, MPU6050_DATA_START_REG, 		// MEM: Memory/register operation
-						I2C_MEMADD_SIZE_8BIT, i2c_rx, I2C_RX_FRAME_SIZE,100);
+	HAL_I2C_Mem_Read_DMA(&hi2c1, MPU6050_ADDR << 1, MPU6050_DATA_START_REG,
+						I2C_MEMADD_SIZE_8BIT, i2c_rx_buffer, I2C_RX_FRAME_SIZE);
+
+						/* Static so these are easy to inspect in the debugger.
+						static volatile HAL_StatusTypeDef dma_status;
+						static volatile uint32_t dma_error;
+
+						i2c_frame_ready = 0;
+
+						dma_status = HAL_I2C_Mem_Read_DMA(
+						    &hi2c1, MPU6050_ADDR << 1,
+						    MPU6050_DATA_START_REG,
+						    I2C_MEMADD_SIZE_8BIT,
+						    i2c_rx_buffer, I2C_RX_FRAME_SIZE);
+
+						HAL_Delay(100);  // Temporary diagnostic wait, in main context
+						dma_error = HAL_I2C_GetError(&hi2c1);
+
+						shell_printf("DMA status=%d, error=0x%08lX, frame_ready=%u\r\n",
+						             (int)dma_status,
+						             (unsigned long)dma_error,
+						             (unsigned int)i2c_frame_ready);
+*/
 
 }
 
@@ -124,6 +145,7 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c){
 
 	if (hi2c->Instance == I2C1){
 		i2c_frame_ready = 1;
+
 	}
 }
 

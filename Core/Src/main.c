@@ -46,6 +46,8 @@
 // SPI
 volatile uint8_t spi_log_flag = 0;
 
+uint8_t next = 0;
+
 
 // USART
 //static uint8_t usart_tx_buffer[];
@@ -67,12 +69,12 @@ volatile uint8_t spi_log_flag = 0;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 
 	if (htim->Instance == TIM2){
-		if (hi2c1.State == HAL_I2C_STATE_READY){
+		//if (hi2c1.State == HAL_I2C_STATE_READY){
 			i2c_sample_flag = 1;
-		}
-		else{
-			i2c_overrun_count++;
-		}
+		//}
+		//else{
+			//i2c_overrun_count++;
+		//}
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 
 	   }
@@ -130,22 +132,31 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  // Sample MPU6050 every 1000ms
-	  if (i2c_sample_flag){
+	  if (i2c_sample_flag && !spi_log_flag && !i2c_frame_ready){
 		 mpu6050_sample();
-		 i2c_sample_flag = 0;
+		 i2c_sample_flag =0;
 	  }
 
 	  // Save received frame bytes in buffer
-	  if (i2c_frame_ready){
-		 for (uint8_t i = 0; i < I2C_RX_FRAME_SIZE; i++){
-			 i2c_rx_buffer[indx++] = i2c_rx[i];
-			 if (indx == I2C_RX_BUFFER_SIZE){	// Check if frame still fits 512 bytes
-				spi_log_flag = 1;		// Flag SD writing
-				 break;
+	  if (i2c_frame_ready && !spi_log_flag){
+		  if(indx <= MPU_LOG_DATA_SIZE-I2C_RX_FRAME_SIZE){
+			 for (uint8_t i = 0; i < I2C_RX_FRAME_SIZE; i++){
+				  mpu_log_buffer[indx++] = i2c_rx_buffer[i];
 			 }
-		 }
-		 i2c_frame_ready = 0;
+			 i2c_frame_ready = 0;
+		  }
+
+		  if (indx == MPU_LOG_DATA_SIZE){	// Check if frame still fits 512 bytes
+			 for (uint16_t i = MPU_LOG_DATA_SIZE; i < MPU_LOG_BUFFER_SIZE; i++){
+				 mpu_log_buffer[i] = 0xFF;
+			  }
+			  spi_log_flag = 1;		// Flag SD writing
+
+		  }
 	  }
+
+
+
 
 	  // Print overrun error if the timer ticked while the i2c was receiving
 	  if (i2c_overrun_count > 0){
