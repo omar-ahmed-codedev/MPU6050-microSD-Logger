@@ -134,6 +134,7 @@ int main(void)
 	  // Sample MPU6050 every 1000ms
 	  if (i2c_sample_flag && !spi_log_flag && !i2c_frame_ready){
 		 mpu6050_sample();
+		 convert_display_live_mpu6050();
 		 i2c_sample_flag =0;
 	  }
 

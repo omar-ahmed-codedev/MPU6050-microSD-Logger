@@ -42,7 +42,6 @@ uint8_t start_timer = 0;
 */
 void mpu6050_init(void){
 
-
 	// Confirm the chip is there
 	uint8_t id =0;			// id should be 0x68
 	if(HAL_I2C_Mem_Read(&hi2c1, MPU6050_ADDR << 1, MPU6050_WHO_AM_I_REG, I2C_MEMADD_SIZE_8BIT, &id, 1, 100) == HAL_OK){
@@ -113,29 +112,46 @@ void mpu6050_sample(void){
 	HAL_I2C_Mem_Read_DMA(&hi2c1, MPU6050_ADDR << 1, MPU6050_DATA_START_REG,
 						I2C_MEMADD_SIZE_8BIT, i2c_rx_buffer, I2C_RX_FRAME_SIZE);
 
-						/* Static so these are easy to inspect in the debugger.
-						static volatile HAL_StatusTypeDef dma_status;
-						static volatile uint32_t dma_error;
-
-						i2c_frame_ready = 0;
-
-						dma_status = HAL_I2C_Mem_Read_DMA(
-						    &hi2c1, MPU6050_ADDR << 1,
-						    MPU6050_DATA_START_REG,
-						    I2C_MEMADD_SIZE_8BIT,
-						    i2c_rx_buffer, I2C_RX_FRAME_SIZE);
-
-						HAL_Delay(100);  // Temporary diagnostic wait, in main context
-						dma_error = HAL_I2C_GetError(&hi2c1);
-
-						shell_printf("DMA status=%d, error=0x%08lX, frame_ready=%u\r\n",
-						             (int)dma_status,
-						             (unsigned long)dma_error,
-						             (unsigned int)i2c_frame_ready);
-*/
-
 }
 
+/**
+* @brief Print latest mpu6050readings
+* @retval None
+*/
+void convert_display_live_mpu6050(void){
+
+	// Combine raw values
+	int16_t accel_x = (int16_t)((i2c_rx_buffer[0]  << 8) | i2c_rx_buffer[1]);
+	int16_t accel_y = (int16_t)((i2c_rx_buffer[2]  << 8) | i2c_rx_buffer[3]);
+	int16_t accel_z = (int16_t)((i2c_rx_buffer[4]  << 8) | i2c_rx_buffer[5]);
+	int16_t temp    = (int16_t)((i2c_rx_buffer[6]  << 8) | i2c_rx_buffer[7]);
+	int16_t gyro_x  = (int16_t)((i2c_rx_buffer[8]  << 8) | i2c_rx_buffer[9]);
+	int16_t gyro_y  = (int16_t)((i2c_rx_buffer[10] << 8) | i2c_rx_buffer[11]);
+	int16_t gyro_z  = (int16_t)((i2c_rx_buffer[12] << 8) | i2c_rx_buffer[13]);
+
+	// Convert to units
+	// Accel
+	float ax_g = accel_x / 16384.0f;   // for AFS_SEL = 0, ±2g range
+	float ay_g = accel_y / 16384.0f;
+	float az_g = accel_z / 16384.0f;
+
+	// Gyro
+	float gx_dps = gyro_x / 131.0f;    // for FS_SEL = 0, ±250°/s range
+	float gy_dps = gyro_y / 131.0f;
+	float gz_dps = gyro_z / 131.0f;
+
+	// Temp
+	float temp_c = temp / 340.0f + 36.53f;
+
+	// Display live values
+	shell_printf("accel_x=%6.3f g   accel_y=%6.3f g   accel_z=%6.3f g\r\n",
+				ax_g, ay_g, az_g);
+	shell_printf("gyro_x =%7.2f dps  gyro_y =%7.2f dps  gyro_z =%7.2f dps\r\n",
+				gx_dps, gy_dps, gz_dps);
+	shell_printf("temp   =%5.1f C\r\n", temp_c);
+
+
+}
 
 /**
 * @brief I2C DMA receive interrupt call back

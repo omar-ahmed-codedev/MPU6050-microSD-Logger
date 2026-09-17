@@ -1,4 +1,5 @@
 ../Core/Src/mpu6050.c:43:6:mpu6050_init	40	static
-../Core/Src/mpu6050.c:111:6:mpu6050_sample	16	static
-../Core/Src/mpu6050.c:144:6:HAL_I2C_MemRxCpltCallback	16	static
-../Core/Src/mpu6050.c:157:6:HAL_I2C_ErrorCallback	16	static
+../Core/Src/mpu6050.c:110:6:mpu6050_sample	16	static
+../Core/Src/mpu6050.c:121:6:convert_display_live_mpu6050	88	static
+../Core/Src/mpu6050.c:160:6:HAL_I2C_MemRxCpltCallback	16	static
+../Core/Src/mpu6050.c:173:6:HAL_I2C_ErrorCallback	16	static

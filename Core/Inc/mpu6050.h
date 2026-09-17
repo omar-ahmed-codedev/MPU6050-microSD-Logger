@@ -55,5 +55,6 @@ extern uint8_t start_timer;
 /* Functions ------------------------------------------------------------------*/
 void mpu6050_sample(void);
 void mpu6050_init(void);
+void convert_display_live_mpu6050(void);
 
 #endif

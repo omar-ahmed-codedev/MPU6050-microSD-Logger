@@ -61,7 +61,7 @@ main-build: MPU6050-microSD-Logger.elf secondary-outputs
 
 # Tool invocations
 MPU6050-microSD-Logger.elf MPU6050-microSD-Logger.map: $(OBJS) $(USER_OBJS) C:\Users\omars\dev\projects\MPU6050-microSD-Logger\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "MPU6050-microSD-Logger.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\omars\dev\projects\MPU6050-microSD-Logger\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MPU6050-microSD-Logger.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "MPU6050-microSD-Logger.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\omars\dev\projects\MPU6050-microSD-Logger\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MPU6050-microSD-Logger.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

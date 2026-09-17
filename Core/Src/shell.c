@@ -61,3 +61,10 @@ void shell_printf(const char *str, ...){
 }
 
 
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART2) {
+        __HAL_UART_CLEAR_OREFLAG(huart);
+    }
+
+}
