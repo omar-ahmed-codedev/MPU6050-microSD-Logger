@@ -60,7 +60,10 @@ void shell_printf(const char *str, ...){
 
 }
 
-
+/**
+* @brief Clear overflow flag when it occurs
+* @retval None
+*/
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
     if (huart->Instance == USART2) {
