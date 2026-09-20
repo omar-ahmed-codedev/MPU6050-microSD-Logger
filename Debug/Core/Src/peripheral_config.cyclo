@@ -5,4 +5,4 @@
 ../Core/Src/peripheral_config.c:194:6:MX_USART2_UART_Init	2
 ../Core/Src/peripheral_config.c:225:6:MX_DMA_Init	1
 ../Core/Src/peripheral_config.c:259:6:MX_GPIO_Init	1
-../Core/Src/peripheral_config.c:294:6:Error_Handler	1
+../Core/Src/peripheral_config.c:297:6:Error_Handler	1

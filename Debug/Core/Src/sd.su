@@ -1,0 +1,7 @@
+../Core/Src/sd.c:23:6:cs_low	8	static
+../Core/Src/sd.c:24:6:cs_high	8	static
+../Core/Src/sd.c:31:9:sd_xfer	32	static
+../Core/Src/sd.c:43:6:sd_send_command	16	static
+../Core/Src/sd.c:58:9:sd_read_r1	16	static
+../Core/Src/sd.c:72:9:sd_send_read_r1	16	static
+../Core/Src/sd.c:83:13:sd_init	24	static

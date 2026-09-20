@@ -30,8 +30,9 @@ char usart_tx_buffer[USART_TX_BUFFER_SIZE];
 /* Code ---------------------------------------------------------*/
 
 /**
-  * @brief  Formats a message and hand it to the TX DMA.
-  */
+ * @brief  Formats a message and hand it to the TX DMA.
+ * * @retval None
+ */
 
 void shell_printf(const char *str, ...){
 

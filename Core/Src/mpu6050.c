@@ -27,7 +27,7 @@ volatile uint8_t i2c_sample_flag = 0;
 volatile uint8_t i2c_frame_ready  = 0;
 
 uint8_t i2c_rx_buffer[I2C_RX_FRAME_SIZE];
-uint8_t mpu_log_buffer[MPU_LOG_BUFFER_SIZE];
+uint8_t mpu_log_buffer[LOG_BUFFER_SIZE];
 
 int i2c_sample_count = 0;
 uint16_t indx = 0;

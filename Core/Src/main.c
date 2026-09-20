@@ -15,13 +15,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "mpu6050.h"
 #include "shell.h"
 #include "peripheral_config.h"
+#include "sd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -148,7 +147,7 @@ int main(void)
 		  }
 
 		  if (indx == MPU_LOG_DATA_SIZE){	// Check if frame still fits 512 bytes
-			 for (uint16_t i = MPU_LOG_DATA_SIZE; i < MPU_LOG_BUFFER_SIZE; i++){
+			 for (uint16_t i = MPU_LOG_DATA_SIZE; i < LOG_BUFFER_SIZE; i++){
 				 mpu_log_buffer[i] = 0xFF;
 			  }
 			  spi_log_flag = 1;		// Flag SD writing

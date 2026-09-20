@@ -24,8 +24,8 @@
 
 /* Defines ------------------------------------------------------------*/
 #define I2C_RX_FRAME_SIZE	14
-#define MPU_LOG_BUFFER_SIZE	512
-#define MPU_FRAME_PERBLOCK		(MPU_LOG_BUFFER_SIZE/I2C_RX_FRAME_SIZE)  //36
+#define LOG_BUFFER_SIZE	512
+#define MPU_FRAME_PERBLOCK		(LOG_BUFFER_SIZE/I2C_RX_FRAME_SIZE)  //36
 #define MPU_LOG_DATA_SIZE		(MPU_FRAME_PERBLOCK*I2C_RX_FRAME_SIZE)		//504
 
 #define MPU6050_ADDR  			0x68
@@ -44,7 +44,7 @@ extern volatile uint8_t i2c_sample_flag;
 extern volatile uint8_t i2c_frame_ready ;
 
 extern uint8_t i2c_rx_buffer[I2C_RX_FRAME_SIZE];
-extern uint8_t mpu_log_buffer[MPU_LOG_BUFFER_SIZE];
+extern uint8_t mpu_log_buffer[LOG_BUFFER_SIZE];
 
 extern int i2c_sample_count;
 extern uint16_t indx;
