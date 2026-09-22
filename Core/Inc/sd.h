@@ -20,6 +20,9 @@
 
 
 /* Variables ---------------------------------------------------------*/
+extern uint8_t	sd_initialized;
+extern uint32_t sd_next_block;
+
 typedef enum {
 	SD_OK = 0,
 	SD_ERROR_CMDO,
