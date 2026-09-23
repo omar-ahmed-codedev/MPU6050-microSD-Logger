@@ -42,7 +42,7 @@
 
 /* USER CODE BEGIN PV */
 uint8_t next = 0;
-
+uint8_t sd_write_failed = 0;
 // USART
 //static uint8_t usart_tx_buffer[];
 
@@ -116,6 +116,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   mpu6050_init();
   HAL_TIM_Base_Start_IT(&htim2);	 // Enable timer interrupt after the mpu6050 has been
+
+  sd_status_t result;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -125,14 +127,14 @@ int main(void)
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
 
-	  // Sample MPU6050 every 1000ms
+	  /* Sample MPU6050 every 1000ms */
 	  if (i2c_sample_flag && !sd_buffer_log_flag && !i2c_frame_ready){
 		 mpu6050_sample();
 		 convert_display_live_mpu6050();
 		 i2c_sample_flag =0;
 	  }
 
-	  // Save received frame bytes in buffer
+	  /* Save received frame bytes in buffer */
 	  if (i2c_frame_ready && !sd_buffer_log_flag){
 		  if(indx <= MPU_LOG_DATA_SIZE-I2C_RX_FRAME_SIZE){
 			 for (uint8_t i = 0; i < I2C_RX_FRAME_SIZE; i++){
@@ -148,7 +150,9 @@ int main(void)
 
 		  }
 	  }
-	  if (sd_buffer_log_flag && !sd_write_flag){			// Fill write buffer when log buffer is full
+
+	  /* Fill write buffer when log buffer is full */
+	  if (sd_buffer_log_flag && !sd_write_flag){
 		  for (uint16_t i = 0; i<LOG_BUFFER_SIZE; i++){
 		  sd_write_buffer[i]=mpu_log_buffer[i];
 		  }
@@ -158,10 +162,28 @@ int main(void)
 
 	  }
 
+	  /* Write buffer in SD */
+	  if (sd_write_flag && !sd_write_failed){
+		  if (!sd_write_in_progress){
+			  result = sd_write_block(sd_write_buffer);
+		  }
+		  else{
+			  result = sd_write_poll();
+		  }
+
+		  if(result == SD_OK){
+			  sd_write_flag = 0;
+			  shell_printf("Data block written to card.\r\n");
+		  }
+		  else if (result != SD_BUSY){
+			  sd_write_failed = 1;
+			  shell_printf("SD write failed: %d\r\n", result);
+		  }
+	  }
 
 
 
-	  // Print overrun error if the timer ticked while the i2c was receiving
+	  /* Print overrun error if the timer ticked while the i2c was receiving */
 	  if (i2c_overrun_count > 0){
 	      shell_printf("I2C sample overrun: %u!\r\n", i2c_overrun_count);
 	  }

@@ -21,6 +21,13 @@ uint8_t	 sd_block_addressing = 0;
 uint8_t	 sd_initialized = 0;
 uint32_t sd_next_block = 0;
 uint16_t blocks_written	= 0;
+uint8_t  sd_write_in_progress = 0;
+
+uint32_t sd_write_start_time = 0;
+
+uint8_t r1;
+uint8_t resp;
+uint32_t address;	// Current write address
 
 volatile uint8_t sd_buffer_log_flag = 0;
 volatile uint8_t sd_write_flag = 0;
@@ -90,7 +97,6 @@ uint8_t sd_send_read_r1(uint8_t cmd, uint32_t arg, uint8_t crc){
 
 sd_status_t sd_init(void){
 
-	uint8_t  r1;
 	uint8_t  resp[4];
 	uint32_t t0;
 
@@ -158,11 +164,9 @@ sd_status_t sd_init(void){
   * @retval sd_status_t value
   */
 sd_status_t sd_write_block(uint8_t *buf){
-
-    uint8_t r1;
-    uint8_t resp;
-    uint32_t address;
-    uint8_t programming_finished = 0;	// Card programming after writing a block
+    if (sd_write_in_progress) {
+        return SD_BUSY;
+    }
 
     if (!sd_initialized) {return SD_ERROR_NOT_INIT;}
 
@@ -177,6 +181,7 @@ sd_status_t sd_write_block(uint8_t *buf){
     sd_xfer(0xFE);          // data token: 512 bytes follow
 
 	/* Write buffer */
+    sd_write_start_time = HAL_GetTick();
     for (uint16_t i = 0; i < SD_BLOCK_SIZE; i++){
          sd_xfer(buf[i]);
 	}
@@ -190,20 +195,32 @@ sd_status_t sd_write_block(uint8_t *buf){
     resp = sd_xfer(0xFF);
     if ((resp & 0x1F) != 0x05) { sd_end_comm(); return SD_ERROR_WRITE; }
 
+    sd_write_in_progress = 1;
+    // Leave CS low. The card is now programming.
+
+    return SD_BUSY;
+}
+
+
+/**
+  * @brief Poll until card finished programming and finish write
+  * @retval sd_status_t value
+  */
+sd_status_t sd_write_poll(void){
 
     /* The card holds MISO low while programming its flash.
        Usually 1-5 ms, but can exceed 100 ms when the card does
        internal housekeeping. */
-    uint32_t t0 = HAL_GetTick();
-    while (HAL_GetTick() - t0 < 500){
-    	if(sd_xfer(0xFF) == 0xFF){
-    		programming_finished = 1;
-    		break;
+    if(sd_xfer(0xFF) != 0xFF){
+    	if(HAL_GetTick()-sd_write_start_time > 1000){
+    		sd_end_comm();
+    		 sd_write_in_progress = 0;
+    		return SD_ERROR_WRITE;
     	}
+    	return SD_BUSY;
     }
-    if (!programming_finished) { sd_end_comm(); return SD_ERROR_TIMEOUT; }
 
-    /* Check for programming erros. Command -> */
+    /* Check for programming erros. Command -> 13 00 00 00 00 01*/
     r1 = sd_send_read_r1(13, 0, 0x01);
     resp = sd_xfer(0xFF);  // CMD13 returns two status bytes.
     if (r1 != 0x00 || resp != 0x00) { sd_end_comm(); return SD_ERROR_WRITE; }
@@ -211,8 +228,7 @@ sd_status_t sd_write_block(uint8_t *buf){
     /* End Communication */
     sd_end_comm();
 
-	/* advance only on success */
-    shell_printf("Data block written in card.\r\n");
+	/* Advance only on success */
     blocks_written++;
     sd_next_block++;
 
