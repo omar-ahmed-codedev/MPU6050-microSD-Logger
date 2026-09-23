@@ -15,13 +15,18 @@
 #include "stm32f4xx_hal.h"
 #include <stdint.h>
 /* Defines ------------------------------------------------------------------*/
-// LOG_BUFFER_SIZE	512
-// SD_CS_Pin
+#define	SD_START_BLOCK	100000	//51 MB in
+#define SD_BLOCK_SIZE	512
 
 
 /* Variables ---------------------------------------------------------*/
 extern uint8_t	sd_initialized;
 extern uint32_t sd_next_block;
+extern uint16_t blocks_written;
+
+extern volatile uint8_t sd_buffer_log_flag;
+extern volatile uint8_t sd_write_flag;
+extern uint8_t sd_write_buffer[SD_BLOCK_SIZE];
 
 typedef enum {
 	SD_OK = 0,
@@ -41,5 +46,6 @@ void sd_send_command (uint8_t cmd, uint32_t arg, uint8_t crc);
 void cs_low(void);
 void cs_high(void);
 sd_status_t sd_init(void);
+sd_status_t sd_write_block(uint8_t *buf);
 
 #endif

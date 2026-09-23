@@ -1,7 +1,9 @@
-../Core/Src/sd.c:26:6:cs_low	8	static
-../Core/Src/sd.c:27:6:cs_high	8	static
-../Core/Src/sd.c:34:9:sd_xfer	32	static
-../Core/Src/sd.c:46:6:sd_send_command	16	static
-../Core/Src/sd.c:61:9:sd_read_r1	16	static
-../Core/Src/sd.c:75:9:sd_send_read_r1	16	static
-../Core/Src/sd.c:86:13:sd_init	40	static
+../Core/Src/sd.c:31:6:cs_low	8	static
+../Core/Src/sd.c:32:6:cs_high	8	static
+../Core/Src/sd.c:33:6:sd_end_comm	8	static
+../Core/Src/sd.c:39:9:sd_xfer	32	static
+../Core/Src/sd.c:51:6:sd_send_command	16	static
+../Core/Src/sd.c:66:9:sd_read_r1	16	static
+../Core/Src/sd.c:80:9:sd_send_read_r1	16	static
+../Core/Src/sd.c:91:13:sd_init	40	static
+../Core/Src/sd.c:160:13:sd_write_block	32	static

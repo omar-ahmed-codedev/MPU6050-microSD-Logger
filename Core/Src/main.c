@@ -41,12 +41,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
-// SPI
-volatile uint8_t spi_log_flag = 0;
-
 uint8_t next = 0;
-
 
 // USART
 //static uint8_t usart_tx_buffer[];
@@ -131,28 +126,36 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  // Sample MPU6050 every 1000ms
-	  if (i2c_sample_flag && !spi_log_flag && !i2c_frame_ready){
+	  if (i2c_sample_flag && !sd_buffer_log_flag && !i2c_frame_ready){
 		 mpu6050_sample();
 		 convert_display_live_mpu6050();
 		 i2c_sample_flag =0;
 	  }
 
 	  // Save received frame bytes in buffer
-	  if (i2c_frame_ready && !spi_log_flag){
+	  if (i2c_frame_ready && !sd_buffer_log_flag){
 		  if(indx <= MPU_LOG_DATA_SIZE-I2C_RX_FRAME_SIZE){
 			 for (uint8_t i = 0; i < I2C_RX_FRAME_SIZE; i++){
 				  mpu_log_buffer[indx++] = i2c_rx_buffer[i];
 			 }
 			 i2c_frame_ready = 0;
 		  }
-
 		  if (indx == MPU_LOG_DATA_SIZE){	// Check if frame still fits 512 bytes
 			 for (uint16_t i = MPU_LOG_DATA_SIZE; i < LOG_BUFFER_SIZE; i++){
 				 mpu_log_buffer[i] = 0xFF;
 			  }
-			  spi_log_flag = 1;		// Flag SD writing
+			  sd_buffer_log_flag = 1;		// Flag SD writing
 
 		  }
+	  }
+	  if (sd_buffer_log_flag && !sd_write_flag){			// Fill write buffer when log buffer is full
+		  for (uint16_t i = 0; i<LOG_BUFFER_SIZE; i++){
+		  sd_write_buffer[i]=mpu_log_buffer[i];
+		  }
+		  indx = 0;
+		  sd_buffer_log_flag = 0;
+		  sd_write_flag = 1;
+
 	  }
 
 
