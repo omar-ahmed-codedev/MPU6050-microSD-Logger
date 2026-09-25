@@ -219,6 +219,7 @@ void MX_USART2_UART_Init(void)
 
 }
 
+
 /**
   * Enable DMA controller clock
   */

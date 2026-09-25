@@ -8,3 +8,4 @@
 ../Core/Src/sd.c:98:13:sd_init	40	static
 ../Core/Src/sd.c:166:13:sd_write_block	24	static
 ../Core/Src/sd.c:209:13:sd_write_poll	8	static
+../Core/Src/sd.c:244:13:sd_read_block	16	static

@@ -1,2 +1,0 @@
-../Core/Src/shell.c:37:6:shell_printf	16	static
-../Core/Src/shell.c:68:6:HAL_UART_ErrorCallback	24	static

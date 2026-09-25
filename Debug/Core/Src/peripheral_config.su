@@ -3,6 +3,6 @@
 ../Core/Src/peripheral_config.c:111:6:MX_SPI1_Init	8	static
 ../Core/Src/peripheral_config.c:149:6:MX_TIM2_Init	32	static
 ../Core/Src/peripheral_config.c:194:6:MX_USART2_UART_Init	8	static
-../Core/Src/peripheral_config.c:225:6:MX_DMA_Init	16	static
-../Core/Src/peripheral_config.c:259:6:MX_GPIO_Init	40	static
-../Core/Src/peripheral_config.c:297:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/peripheral_config.c:226:6:MX_DMA_Init	16	static
+../Core/Src/peripheral_config.c:260:6:MX_GPIO_Init	40	static
+../Core/Src/peripheral_config.c:298:6:Error_Handler	4	static,ignoring_inline_asm

@@ -50,7 +50,7 @@ void mpu6050_init(void){
 	else {
 		uint32_t error = HAL_I2C_GetError(&hi2c1);
 		shell_printf("WHO_AM_I: error=0x%08lX id=0x%02X\r\n",
-			             (unsigned long)error, (unsigned int)id);
+			             error, id);
 	}
 
 	// Wake sensor up ans set clock.

@@ -8,3 +8,4 @@
 ../Core/Src/sd.c:98:13:sd_init	14
 ../Core/Src/sd.c:166:13:sd_write_block	7
 ../Core/Src/sd.c:209:13:sd_write_poll	5
+../Core/Src/sd.c:244:13:sd_read_block	1

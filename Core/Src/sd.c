@@ -234,3 +234,16 @@ sd_status_t sd_write_poll(void){
 
     return SD_OK;
 }
+
+
+/**
+  * @brief Read sd block
+  * @retval sd_status_t
+  */
+
+sd_status_t sd_read_block(uint32_t block){
+
+
+}
+
+

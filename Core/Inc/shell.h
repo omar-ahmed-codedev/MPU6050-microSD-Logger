@@ -23,16 +23,21 @@
 
 
 /* Defines ------------------------------------------------------------------*/
-#define USART_RX_BUFFER_SIZE	64
-#define USART_TX_BUFFER_SIZE	256
+#define UART_RX_BUFFER_SIZE	64
+#define UART_TX_BUFFER_SIZE	256
+#define MSG_LEN_MAX				64
 
 /* Variables ---------------------------------------------------------*/
 extern UART_HandleTypeDef huart2;
 
-extern uint8_t usart_rx_buffer[USART_RX_BUFFER_SIZE];
-extern char usart_tx_buffer[USART_TX_BUFFER_SIZE];
+extern uint8_t usart_rx_buffer[UART_RX_BUFFER_SIZE];
+extern char usart_tx_buffer[UART_TX_BUFFER_SIZE];
+extern uint8_t uart_rx_ready;
 
 /* Functions ---------------------------------------------------------*/
 void shell_printf(const char *msg, ...);		// ... is ellipsis. variadic function --> accepts any number of additional arguments
-
+void UART_Recieve_Start(void);
+void shell_poll(void);
+void shell_execute(char *msg);
+int parse_int(char *str, uint32_t *val);
 #endif
