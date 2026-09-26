@@ -175,6 +175,7 @@ int main(void)
 		  }
 		  else{
 			  result = sd_write_poll();
+
 		  }
 
 		  if(result == SD_OK){
@@ -184,6 +185,29 @@ int main(void)
 		  else if (result != SD_BUSY){
 			  sd_write_failed = 1;
 			  shell_printf("SD write failed: %d\r\n", result);
+		  }
+	  }
+
+	  /* Read and print block from SD */
+	  if (sd_read_flag && !sd_read_failed && !sd_write_in_progress){
+		  if(!sd_read_request_in_progress){
+			  result = sd_request_block(sd_rx_block);
+		  }
+		  else{
+			  result = sd_read_block();
+		  }
+		  if(result == SD_OK){
+			  shell_printf("Block %u read successfully:\r\n", sd_rx_block); //print block address
+			  for (uint16_t i = 0; i < SD_BLOCK_SIZE; i++) {	// Print block
+			      shell_printf("%u\r\n", sd_read_buffer[i]);
+			  }
+
+
+		  }
+		  else if (result != SD_BUSY){
+			  sd_read_failed = 1;
+			  sd_read_flag = 0;
+			  shell_printf("SD block read failed: %d\r\n", result);
 		  }
 	  }
 

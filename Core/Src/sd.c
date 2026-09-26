@@ -175,6 +175,7 @@ sd_status_t sd_init(void){
   * @retval sd_status_t value
   */
 sd_status_t sd_write_block(uint8_t *buf){
+
     if (!sd_initialized) {return SD_ERROR_WRITE;}
 
     if (sd_write_in_progress) { return SD_BUSY; }
@@ -252,6 +253,31 @@ sd_status_t sd_write_poll(void){
     return SD_OK;
 }
 
+
+/**
+  * @brief Request sd block read
+  * @retval sd_status_t
+  */
+
+sd_status_t sd_request_block(uint32_t block){
+
+	if (!sd_initialized) { return SD_ERROR_READ; }
+
+	if (sd_write_in_progress || sd_read_request_in_progress) { return SD_BUSY; }
+
+	cs_low();
+	/* Request block. Command ->  17 00 00 00 00 01*/
+	address = sd_block_addressing ? block : block * 512;
+	r1 = sd_send_read_r1(17, address, 0x01);	// r1 = 0x00 when accepted
+	if (r1 != 0x00){ sd_end_comm();  return SD_ERROR_READ; }
+
+	sd_read_start_time = HAL_GetTick();
+	sd_read_request_in_progress = 1;
+
+	return SD_BUSY;
+}
+
+
 /**
   * @brief read sd block read
   * @retval sd_status_t
@@ -259,7 +285,44 @@ sd_status_t sd_write_poll(void){
 
 sd_status_t sd_read_block(void){
 
+	uint8_t token;
 
+
+	if (!sd_read_request_in_progress) { return SD_ERROR_READ; }
+
+	/* Error timeout*/
+	if (HAL_GetTick() - sd_read_start_time > 1000){
+		sd_end_comm();
+		sd_read_request_in_progress = 0;
+		return SD_ERROR_TIMEOUT;
+	}
+
+
+	/* Expect 0xFE to receive the block after or 0xFF while the card fetches from flash */
+	token = sd_xfer(0xFF);
+	if (token == 0xFF) { return SD_BUSY; }
+	if (token != 0xFE) {
+		sd_end_comm();
+	    sd_read_request_in_progress = 0;
+	    return SD_ERROR_READ;
+	}
+
+
+	/* Read block */
+	for (uint16_t i = 0; i < SD_BLOCK_SIZE; i++){
+		sd_read_buffer[i] = sd_xfer(0xFF);
+	}
+
+	/* CRC16 - read and discard. */
+	sd_xfer(0xFF);
+	sd_xfer(0xFF);
+
+    /* End Communication */
+    sd_end_comm();
+    sd_read_request_in_progress = 0;
+    sd_read_flag = 0;
+
+    return SD_OK;
 }
 
 
