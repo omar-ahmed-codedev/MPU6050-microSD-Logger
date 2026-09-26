@@ -1,8 +1,8 @@
-../Core/Src/peripheral_config.c:31:6:SystemClock_Config	3
-../Core/Src/peripheral_config.c:77:6:MX_I2C1_Init	2
-../Core/Src/peripheral_config.c:111:6:MX_SPI1_Init	2
-../Core/Src/peripheral_config.c:149:6:MX_TIM2_Init	4
-../Core/Src/peripheral_config.c:194:6:MX_USART2_UART_Init	2
+../Core/Src/peripheral_config.c:32:6:SystemClock_Config	3
+../Core/Src/peripheral_config.c:78:6:MX_I2C1_Init	2
+../Core/Src/peripheral_config.c:112:6:MX_SPI1_Init	2
+../Core/Src/peripheral_config.c:150:6:MX_TIM2_Init	4
+../Core/Src/peripheral_config.c:195:6:MX_USART2_UART_Init	2
 ../Core/Src/peripheral_config.c:226:6:MX_DMA_Init	1
 ../Core/Src/peripheral_config.c:260:6:MX_GPIO_Init	1
 ../Core/Src/peripheral_config.c:298:6:Error_Handler	1

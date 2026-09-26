@@ -30,9 +30,9 @@
 /* Variables ---------------------------------------------------------*/
 extern UART_HandleTypeDef huart2;
 
-extern uint8_t usart_rx_buffer[UART_RX_BUFFER_SIZE];
-extern char usart_tx_buffer[UART_TX_BUFFER_SIZE];
-extern uint8_t uart_rx_ready;
+extern uint8_t uart_rx_buffer[UART_RX_BUFFER_SIZE];
+extern char uart_tx_buffer[UART_TX_BUFFER_SIZE];
+extern volatile uint8_t uart_rx_ready;
 
 /* Functions ---------------------------------------------------------*/
 void shell_printf(const char *msg, ...);		// ... is ellipsis. variadic function --> accepts any number of additional arguments

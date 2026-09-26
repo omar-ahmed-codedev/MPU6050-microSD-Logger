@@ -109,9 +109,10 @@ void mpu6050_init(void){
 */
 void mpu6050_sample(void){
 	// Sensor by defualt updates its registers with 8kHz (DLPF_CFG = 0)
-	HAL_I2C_Mem_Read_DMA(&hi2c1, MPU6050_ADDR << 1, MPU6050_DATA_START_REG,
-						I2C_MEMADD_SIZE_8BIT, i2c_rx_buffer, I2C_RX_FRAME_SIZE);
-
+	if (HAL_I2C_Mem_Read_DMA(&hi2c1, MPU6050_ADDR << 1, MPU6050_DATA_START_REG,
+						I2C_MEMADD_SIZE_8BIT, i2c_rx_buffer, I2C_RX_FRAME_SIZE) != HAL_OK){
+		shell_printf("MPU6050 read error!\r\n");
+	}
 }
 
 /**
@@ -175,7 +176,6 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c){
 	if (hi2c->Instance == I2C1){
         i2c_sample_flag = 0;
         i2c_frame_ready = 0;
-        shell_printf("I2C error!\r\n");
     }
 
 

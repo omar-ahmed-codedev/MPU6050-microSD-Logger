@@ -15,6 +15,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -40,19 +41,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-I2C_HandleTypeDef hi2c1;
-DMA_HandleTypeDef hdma_i2c1_rx;
-DMA_HandleTypeDef hdma_i2c1_tx;
-
-SPI_HandleTypeDef hspi1;
-DMA_HandleTypeDef hdma_spi1_rx;
-DMA_HandleTypeDef hdma_spi1_tx;
-
-TIM_HandleTypeDef htim2;
-
-UART_HandleTypeDef huart2;
-DMA_HandleTypeDef hdma_usart2_rx;
-DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
 uint8_t next = 0;
@@ -63,13 +51,7 @@ uint8_t sd_write_failed = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
-static void MX_I2C1_Init(void);
-static void MX_SPI1_Init(void);
-static void MX_USART2_UART_Init(void);
-static void MX_TIM2_Init(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -83,18 +65,10 @@ static void MX_TIM2_Init(void);
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 
 	if (htim->Instance == TIM2){
-		//if (hi2c1.State == HAL_I2C_STATE_READY){
 			i2c_sample_flag = 1;
-		//}
-		//else{
-			//i2c_overrun_count++;
-		//}
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-
 	   }
 }
-
-
 
 /* USER CODE END 0 */
 
@@ -132,8 +106,10 @@ int main(void)
   MX_SPI1_Init();
   MX_USART2_UART_Init();
   MX_TIM2_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   mpu6050_init();
+  sd_init();
   HAL_TIM_Base_Start_IT(&htim2);	 // Enable timer interrupt after the mpu6050 has been
   UART_Recieve_Start();
 
@@ -158,7 +134,7 @@ int main(void)
 	  /* Sample MPU6050 every 1000ms */
 	  if (i2c_sample_flag && !sd_buffer_log_flag && !i2c_frame_ready){
 		 mpu6050_sample();
-		 convert_display_live_mpu6050();
+		 //convert_display_live_mpu6050();
 		 i2c_sample_flag =0;
 	  }
 
@@ -175,6 +151,7 @@ int main(void)
 				 mpu_log_buffer[i] = 0xFF;
 			  }
 			  sd_buffer_log_flag = 1;		// Flag SD writing
+			  shell_printf("Sensor log data ready.\r\n");
 
 		  }
 	  }
@@ -184,6 +161,7 @@ int main(void)
 		  for (uint16_t i = 0; i<LOG_BUFFER_SIZE; i++){
 		  sd_write_buffer[i]=mpu_log_buffer[i];
 		  }
+		  shell_printf("SD write buffer filled with sensor data.\r\n");
 		  indx = 0;
 		  sd_buffer_log_flag = 0;
 		  sd_write_flag = 1;
@@ -191,7 +169,7 @@ int main(void)
 	  }
 
 	  /* Write buffer in SD */
-	  if (sd_write_flag && !sd_write_failed){
+	  if (sd_write_flag && !sd_write_failed && !sd_read_request_in_progress){
 		  if (!sd_write_in_progress){
 			  result = sd_write_block(sd_write_buffer);
 		  }
@@ -210,7 +188,6 @@ int main(void)
 	  }
 
 
-
 	  /* Print overrun error if the timer ticked while the i2c was receiving */
 	  if (i2c_overrun_count > 0){
 	      shell_printf("I2C sample overrun: %u!\r\n", i2c_overrun_count);
@@ -221,40 +198,3 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
-
-
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
-}
-#ifdef USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */

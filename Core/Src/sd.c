@@ -17,21 +17,32 @@
 /* Defines ------------------------------------------------------------------*/
 
 /* Variables ---------------------------------------------------------*/
+// SD initialization
 uint8_t	 sd_block_addressing = 0;
 uint8_t	 sd_initialized = 0;
 uint32_t sd_next_block = 0;
 uint16_t blocks_written	= 0;
+
+uint8_t sd_buffer_log_flag = 0;
+
+// SD write
 uint8_t  sd_write_in_progress = 0;
-
 uint32_t sd_write_start_time = 0;
+uint8_t  sd_write_flag = 0;
+uint8_t  sd_write_buffer[SD_BLOCK_SIZE];
 
-uint8_t r1;
-uint8_t resp;
-uint32_t address;	// Current write address
+// SD read
+uint32_t  sd_rx_block = 0; 			// Requested block number.
+uint8_t  sd_read_flag = 0;			// Read requested.
+uint8_t  sd_read_failed = 0;
+uint8_t  sd_read_request_in_progress = 0; // CMD17 accepted; awaiting data.
+uint32_t sd_read_start_time = 0;
+uint8_t  sd_read_buffer[SD_BLOCK_SIZE];
 
-volatile uint8_t sd_buffer_log_flag = 0;
-volatile uint8_t sd_write_flag = 0;
-uint8_t sd_write_buffer[SD_BLOCK_SIZE];
+uint8_t  r1;
+uint8_t  resp;
+uint32_t address;
+
 
 
 /* Code ---------------------------------------------------------*/
@@ -164,11 +175,9 @@ sd_status_t sd_init(void){
   * @retval sd_status_t value
   */
 sd_status_t sd_write_block(uint8_t *buf){
-    if (sd_write_in_progress) {
-        return SD_BUSY;
-    }
+    if (!sd_initialized) {return SD_ERROR_WRITE;}
 
-    if (!sd_initialized) {return SD_ERROR_NOT_INIT;}
+    if (sd_write_in_progress) { return SD_BUSY; }
 
     cs_low();
 
@@ -183,10 +192,10 @@ sd_status_t sd_write_block(uint8_t *buf){
 	/* Write buffer */
     sd_write_start_time = HAL_GetTick();
     for (uint16_t i = 0; i < SD_BLOCK_SIZE; i++){
-         sd_xfer(buf[i]);
+         int x = sd_xfer(buf[i]);
 	}
 
-    // Required CRC field; dummy values while SPI CRC checking is disabled.
+    /* CRC16 - read and discard. */
     sd_xfer(0xFF);
     sd_xfer(0xFF);
 
@@ -203,12 +212,14 @@ sd_status_t sd_write_block(uint8_t *buf){
 
 
 /**
-  * @brief Poll until card finished programming and finish write
+  * @brief Poll until card finished programming and finished write
   * @retval sd_status_t value
   */
 sd_status_t sd_write_poll(void){
 
-    /* The card holds MISO low while programming its flash.
+	if (!sd_write_in_progress) { return SD_ERROR_WRITE; }
+
+	/* The card holds MISO low while programming its flash.
        Usually 1-5 ms, but can exceed 100 ms when the card does
        internal housekeeping. */
     if(sd_xfer(0xFF) != 0xFF){
@@ -220,13 +231,19 @@ sd_status_t sd_write_poll(void){
     	return SD_BUSY;
     }
 
-    /* Check for programming erros. Command -> 13 00 00 00 00 01*/
+    /* Check for programming errors. Command -> 13 00 00 00 00 01*/
     r1 = sd_send_read_r1(13, 0, 0x01);
     resp = sd_xfer(0xFF);  // CMD13 returns two status bytes.
-    if (r1 != 0x00 || resp != 0x00) { sd_end_comm(); return SD_ERROR_WRITE; }
+    if (r1 != 0x00 || resp != 0x00) {
+    	sd_end_comm();
+        sd_write_in_progress = 0;
+    	return SD_ERROR_WRITE;
+    }
 
     /* End Communication */
     sd_end_comm();
+    sd_write_in_progress = 0;
+    sd_write_flag = 0;
 
 	/* Advance only on success */
     blocks_written++;
@@ -235,15 +252,69 @@ sd_status_t sd_write_poll(void){
     return SD_OK;
 }
 
-
 /**
-  * @brief Read sd block
+  * @brief read sd block read
   * @retval sd_status_t
   */
 
-sd_status_t sd_read_block(uint32_t block){
+sd_status_t sd_read_block(void){
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -24,6 +24,7 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -218,7 +219,6 @@ void MX_USART2_UART_Init(void)
   /* USER CODE END USART2_Init 2 */
 
 }
-
 
 /**
   * Enable DMA controller clock

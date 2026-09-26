@@ -1,0 +1,7 @@
+../Core/Src/shell.c:44:6:UART_Recieve_Start	8	static
+../Core/Src/shell.c:54:6:HAL_UARTEx_RxEventCallback	16	static
+../Core/Src/shell.c:65:6:shell_poll	16	static
+../Core/Src/shell.c:99:6:shell_execute	24	static
+../Core/Src/shell.c:138:5:parse_int	24	static
+../Core/Src/shell.c:171:6:shell_printf	16	static
+../Core/Src/shell.c:202:6:HAL_UART_ErrorCallback	32	static

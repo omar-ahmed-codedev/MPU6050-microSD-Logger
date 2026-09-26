@@ -27,12 +27,12 @@
 
 /* Variables ---------------------------------------------------------*/
 uint8_t uart_rx_buffer[UART_RX_BUFFER_SIZE];
-char uart_tx_buffer[UART_TX_BUFFER_SIZE];
-uint8_t uart_rx_ready = 0;
+char    uart_tx_buffer[UART_TX_BUFFER_SIZE];
+volatile uint8_t uart_rx_ready = 0;
 
 uint8_t rx_head = 0;
 uint8_t rx_tail = 0;
-char rx_msg[MSG_LEN_MAX];
+char    rx_msg[MSG_LEN_MAX];
 uint8_t rx_msg_len = 0;
 
 
@@ -55,7 +55,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size){  //si
 
 	if(huart->Instance == USART2){
 		uart_rx_ready = 1;
-		HAL_UARTEx_ReceiveToIdle_DMA(&huart2, uart_rx_buffer, UART_RX_BUFFER_SIZE); // Call interrupt again to continue receiving data since it was disabled after calling the callback
 	}
 }
 
@@ -66,7 +65,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size){  //si
 void shell_poll(void){
 	// Buffer size - NDTR, to get where the recieve msg stopped.
 	// NDTR is updated continously.
-	rx_head = UART_RX_BUFFER_SIZE - (uint16_t)__HAL_DMA_GET_COUNTER(huart2.hdmarx);
+	rx_head = (UART_RX_BUFFER_SIZE - (uint16_t)__HAL_DMA_GET_COUNTER(huart2.hdmarx))
+			% UART_RX_BUFFER_SIZE;
+
 
 	while (rx_tail != rx_head){			// tail = head when a msg is complete
 
@@ -109,13 +110,18 @@ void shell_execute(char *msg){
 					sd_next_block-1);
 
 	}	// Print a specefic block
-	else if (strncmp(msg, "get sd block", 12)==0){
-		if(!parse_int(msg+3, &block) || block > sd_next_block){
-			shell_printf("Error: invalid block address, expects <Range>!\r\n");
+	else if (strncmp(msg, "get sd block ", 13)==0){
+		if (sd_read_flag) {
+		        shell_printf("An SD read is already waiting or running.\r\n");
 		}
-		else if(block<=sd_next_block){
-			sd_read_block(block);
-			shell_printf("Block %d: \r\n", block);
+		else if(!parse_int(msg+13, &block) || block < SD_START_BLOCK|| block >= sd_next_block){
+			shell_printf("Error: invalid block address!\r\n");
+		}
+		else {
+			sd_rx_block = block;
+			sd_read_failed = 0;
+			sd_read_flag = 1;
+			//shell_printf("Block %d: \r\n", block);
 		}
 
 	}
@@ -176,15 +182,15 @@ void shell_printf(const char *str, ...){
     va_start(args, str);        // Gives vsnprint access to the arguments supplied through ...
 
     // Formulate the arguments into a string buffer with a max.
-    len = vsnprintf(usart_tx_buffer, USART_TX_BUFFER_SIZE, str, args);        // Difference between snprintf is that it accepts vardiac (accepts additional arguments)
+    len = vsnprintf(uart_tx_buffer, UART_TX_BUFFER_SIZE, str, args);        // Difference between snprintf is that it accepts vardiac (accepts additional arguments)
                                                                // Len recieves the bytes written or would have been written if the buffer is not long enough in the buffer. (minus 1(\0))
     va_end(args);      // Finished using va_start
     if (len > 0){
-        if(len> (int) USART_TX_BUFFER_SIZE){
-            len = (int) USART_TX_BUFFER_SIZE;
+        if(len > (int) UART_TX_BUFFER_SIZE){
+            len = (int) UART_TX_BUFFER_SIZE;
         }
         // Starts the transmission and returns before all the bytes have physically been transmitted.
-        HAL_UART_Transmit(&huart2,(uint8_t *)usart_tx_buffer, (uint16_t) len,100);
+        HAL_UART_Transmit(&huart2,(uint8_t *)uart_tx_buffer, (uint16_t) len,100);
     }
 
 }
@@ -195,8 +201,16 @@ void shell_printf(const char *str, ...){
 */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART2) {
-        __HAL_UART_CLEAR_OREFLAG(huart);
-    }
 
+    if(huart->Instance == USART2){
+        __HAL_UART_CLEAR_OREFLAG(huart);    // A new byte finished arriving in the shift register before the previous one was read out of DR
+        __HAL_UART_CLEAR_NEFLAG(huart);     // If the three samples in the middle of sampling disagree, the bit was noisy
+        __HAL_UART_CLEAR_FEFLAG(huart);     // Frame error: stop bit was where it should not be
+
+        if (huart->RxState != HAL_UART_STATE_BUSY_RX)
+        {
+        UART_Recieve_Start();
+        }
+    }
 }
+
