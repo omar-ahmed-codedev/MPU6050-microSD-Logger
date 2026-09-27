@@ -35,6 +35,7 @@ uint8_t rx_head = 0;
 uint8_t rx_tail = 0;
 char    rx_msg[MSG_LEN_MAX];
 uint8_t rx_msg_len = 0;
+uint8_t pause_sd_logging = 0;
 
 
 /* Code ---------------------------------------------------------*/
@@ -103,15 +104,17 @@ void shell_execute(char *msg){
 
 	// Check msg
 	// help
-	if(strncmp(msg, "help",4)==0){
+	if(strncmp(msg, "help",4) == 0){
 		shell_printf("\r\n"
 					"read block <block number, start from 100000>\tPrint MPU6050 data stored in that block\r\n"
-					"help\tthis text\r\n\r\n",
+					"pause sensor logging in sd\r\n"
+					"resume sensor logging in sd\r\n"
+					"help\r\n\r\n",
 					SD_START_BLOCK,
 					sd_next_block-1);
 
 	}	// Print a specefic block
-	else if (strncmp(msg, "read block", 10)==0){
+	else if (strncmp(msg, "read block", 10) == 0){
 		if (sd_read_flag) {
 		        shell_printf("An SD read is already waiting or running.\r\n");
 		}
@@ -127,11 +130,16 @@ void shell_execute(char *msg){
 		}
 
 	}
+	else if (strncmp(msg, "pause sensor logging", 20) == 0){
+		pause_sd_logging = 1;
+		 shell_printf("SD logging paused.\r\n");
+	}
+	else if(strncmp(msg, "resume sensor logging", 21) == 0){
+		pause_sd_logging = 0;
+		shell_printf("SD logging resumed.\r\n");
+	}
 	else{
 		shell_printf("Error: unknown command!\r\n\r\n");
-		for(uint8_t i = 0; i <= rx_head; i++){
-					 shell_printf("%c", msg[i]);}
-							shell_printf("\r\n");
 	}
 }
 

@@ -134,7 +134,6 @@ int main(void)
 	  /* Sample MPU6050 every 1000ms */
 	  if (i2c_sample_flag && !sd_buffer_log_flag && !i2c_frame_ready){
 		 mpu6050_sample();
-		 convert_display_live_mpu6050();
 		 i2c_sample_flag =0;
 	  }
 
@@ -169,7 +168,10 @@ int main(void)
 	  }
 
 	  /* Write buffer in SD */
-	  if (sd_write_flag && !sd_write_failed && !sd_read_request_in_progress){
+	  if (sd_write_flag && !sd_write_failed
+			  && !sd_read_request_in_progress &&
+			  (!pause_sd_logging || sd_write_in_progress)){		// Pause a new start not an active one
+
 		  if (!sd_write_in_progress){
 			  result = sd_write_block(sd_write_buffer);
 		  }
