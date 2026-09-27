@@ -52,10 +52,26 @@ extern volatile uint32_t i2c_overrun_count;
 extern uint8_t start_timer;
 
 
+typedef enum {
+	MPU_OK = 0,
+	MPU_ERROR_WHO_AM_I,
+	MPU_ERROR_PWR_MGMT,
+	MPU_ERROR_SMPLRT_DIV,
+	MPU_ERROR_CONFIG_REG,	//output rate
+	MPU_ERROR_FS_SEL,		// Config gyro
+	MPU_ERROR_AFS_SEL,		// Config accl
+
+} mpu_status_t;
+
+
+
 /* Functions ------------------------------------------------------------------*/
 void mpu6050_sample(void);
-void mpu6050_init(void);
+mpu_status_t mpu6050_init(void);
 void convert_display_live_mpu6050(void);
 void decode_print_sd_rx_block(uint8_t *read_buffer);
+
+
+
 
 #endif

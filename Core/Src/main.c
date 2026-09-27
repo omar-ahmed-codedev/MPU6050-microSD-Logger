@@ -108,9 +108,15 @@ int main(void)
   MX_TIM2_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-  mpu6050_init();
   sd_init();
-  HAL_TIM_Base_Start_IT(&htim2);	 // Enable timer interrupt after the mpu6050 has been
+  mpu_status_t mpu_result = mpu6050_init();
+
+  if (mpu_result == MPU_OK) {
+	  HAL_TIM_Base_Start_IT(&htim2);	 // Enable timer interrupt after the mpu6050 has been
+  } else {
+      shell_printf("MPU initialization failed: %d\r\n", (int)mpu_result);
+  }
+
   UART_Recieve_Start();
 
   sd_status_t result;
@@ -182,11 +188,11 @@ int main(void)
 
 		  if(result == SD_OK){
 			  sd_write_flag = 0;
-			  shell_printf("Data block written to card.\r\n");
+			  shell_printf("\r\nData block written in card.\r\n");
 		  }
 		  else if (result != SD_BUSY){
 			  sd_write_failed = 1;
-			  shell_printf("SD write failed: %d\r\n", result);
+			  shell_printf("\r\nSD write failed: %d\r\n", result);
 		  }
 	  }
 
