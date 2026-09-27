@@ -114,6 +114,8 @@ int main(void)
   UART_Recieve_Start();
 
   sd_status_t result;
+
+  shell_printf("\r\nSTM32F401RE shell ready. Type 'help'.\r\n\r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -129,12 +131,10 @@ int main(void)
 	  	  shell_poll();
 	  }
 
-
-
 	  /* Sample MPU6050 every 1000ms */
 	  if (i2c_sample_flag && !sd_buffer_log_flag && !i2c_frame_ready){
 		 mpu6050_sample();
-		 //convert_display_live_mpu6050();
+		 convert_display_live_mpu6050();
 		 i2c_sample_flag =0;
 	  }
 
@@ -197,12 +197,8 @@ int main(void)
 			  result = sd_read_block();
 		  }
 		  if(result == SD_OK){
-			  shell_printf("Block %u read successfully:\r\n", sd_rx_block); //print block address
-			  for (uint16_t i = 0; i < SD_BLOCK_SIZE; i++) {	// Print block
-			      shell_printf("%u\r\n", sd_read_buffer[i]);
-			  }
-
-
+			  shell_printf("Block %u read successfully:\r\n", sd_read_block); //print block address
+			  decode_print_sd_rx_block(sd_read_buffer);
 		  }
 		  else if (result != SD_BUSY){
 			  sd_read_failed = 1;

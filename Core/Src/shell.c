@@ -18,6 +18,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "shell.h"
 #include "sd.h"
+#include "mpu6050.h"
 #include "stm32f4xx_ll_usart.h"
 
 #include <string.h>		// Byte and string manipulation
@@ -104,29 +105,33 @@ void shell_execute(char *msg){
 	// help
 	if(strncmp(msg, "help",4)==0){
 		shell_printf("\r\n"
-					"read block <%d-%d>		Print MPU6050 data stored in that block\r\n"
-					"help			this text\r\n\r\n",
+					"read block <block number, start from 100000>\tPrint MPU6050 data stored in that block\r\n"
+					"help\tthis text\r\n\r\n",
 					SD_START_BLOCK,
 					sd_next_block-1);
 
 	}	// Print a specefic block
-	else if (strncmp(msg, "get sd block ", 13)==0){
+	else if (strncmp(msg, "read block", 10)==0){
 		if (sd_read_flag) {
 		        shell_printf("An SD read is already waiting or running.\r\n");
 		}
-		else if(!parse_int(msg+13, &block) || block < SD_START_BLOCK|| block >= sd_next_block){
+		else if(!parse_int(msg+11, &block) || block < SD_START_BLOCK|| block >= sd_next_block){
 			shell_printf("Error: invalid block address!\r\n");
+
 		}
 		else {
 			sd_rx_block = block;
 			sd_read_failed = 0;
 			sd_read_flag = 1;
-			//shell_printf("Block %d: \r\n", block);
+
 		}
 
 	}
 	else{
 		shell_printf("Error: unknown command!\r\n\r\n");
+		for(uint8_t i = 0; i <= rx_head; i++){
+					 shell_printf("%c", msg[i]);}
+							shell_printf("\r\n");
 	}
 }
 
@@ -193,6 +198,62 @@ void shell_printf(const char *str, ...){
         HAL_UART_Transmit(&huart2,(uint8_t *)uart_tx_buffer, (uint16_t) len,100);
     }
 
+}
+
+
+/**
+  * @brief Convert the read bytes into human readable values and print them
+  * @retval none
+  */
+void decode_print_sd_rx_block(uint8_t *read_buffer){
+
+	// Raw valiue
+	int16_t accel_x;
+	int16_t accel_y;
+	int16_t accel_z;
+	int16_t temp;
+	int16_t gyro_x;
+	int16_t gyro_y;
+	int16_t gyro_z;
+
+	float ax_g;
+	float ay_g;
+	float az_g;
+	float gx_dps;
+	float gy_dps;
+	float gz_dps;
+	float temp_c;
+
+
+	for (uint16_t i = 0; i < MPU_LOG_DATA_SIZE; i += I2C_RX_FRAME_SIZE){
+
+		uint8_t *frame = read_buffer + i;
+		// Raw bytes
+		accel_x = (int16_t)((frame[0]  << 8) | frame[1]);
+		accel_y = (int16_t)((frame[2]  << 8) | frame[3]);
+		accel_z = (int16_t)((frame[4]  << 8) | frame[5]);
+		temp    = (int16_t)((frame[6]  << 8) | frame[7]);
+		gyro_x  = (int16_t)((frame[8]  << 8) | frame[9]);
+		gyro_y  = (int16_t)((frame[10] << 8) | frame[11]);
+		gyro_z  = (int16_t)((frame[12] << 8) | frame[13]);
+
+		// Convert to units
+		ax_g = accel_x / 16384.0f;   // Accel	// for AFS_SEL = 0, ±2g range
+		ay_g = accel_y / 16384.0f;
+		az_g = accel_z / 16384.0f;
+		temp_c = temp / 340.0f + 36.53f;	// Temp
+		gx_dps = gyro_x / 131.0f;   	// Gyro	 // for FS_SEL = 0, ±250°/s range
+		gy_dps = gyro_y / 131.0f;
+		gz_dps = gyro_z / 131.0f;
+
+		// Print values
+		shell_printf("accel_x=%6.3f g   accel_y=%6.3f g   accel_z=%6.3f g\r\n",
+						ax_g, ay_g, az_g);
+		shell_printf("gyro_x =%7.2f dps  gyro_y =%7.2f dps  gyro_z =%7.2f dps\r\n",
+						gx_dps, gy_dps, gz_dps);
+		shell_printf("temp   =%5.1f C\r\n", temp_c);
+
+	}
 }
 
 /**

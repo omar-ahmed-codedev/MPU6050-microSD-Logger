@@ -193,7 +193,7 @@ sd_status_t sd_write_block(uint8_t *buf){
 	/* Write buffer */
     sd_write_start_time = HAL_GetTick();
     for (uint16_t i = 0; i < SD_BLOCK_SIZE; i++){
-         int x = sd_xfer(buf[i]);
+         sd_xfer(buf[i]);
 	}
 
     /* CRC16 - read and discard. */
@@ -324,10 +324,6 @@ sd_status_t sd_read_block(void){
 
     return SD_OK;
 }
-
-
-
-
 
 
 

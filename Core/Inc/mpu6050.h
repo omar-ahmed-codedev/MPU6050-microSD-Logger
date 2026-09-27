@@ -56,5 +56,6 @@ extern uint8_t start_timer;
 void mpu6050_sample(void);
 void mpu6050_init(void);
 void convert_display_live_mpu6050(void);
+void decode_print_sd_rx_block(uint8_t *read_buffer);
 
 #endif
