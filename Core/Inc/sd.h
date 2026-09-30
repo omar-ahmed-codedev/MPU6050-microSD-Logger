@@ -21,6 +21,7 @@
 
 /* Variables ---------------------------------------------------------*/
 extern uint8_t	sd_initialized;
+extern uint8_t	 sd_block_addressing;
 extern uint32_t sd_next_block;
 extern uint16_t blocks_written;
 extern uint8_t  sd_buffer_log_flag;

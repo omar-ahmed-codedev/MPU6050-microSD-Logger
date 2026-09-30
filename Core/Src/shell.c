@@ -138,6 +138,9 @@ void shell_execute(char *msg){
 		pause_sd_logging = 0;
 		shell_printf("SD logging resumed.\r\n");
 	}
+	else if(strncmp(msg, "status", 6) == 0){
+		print_status();
+	}
 	else{
 		shell_printf("Error: unknown command!\r\n\r\n");
 	}
@@ -205,6 +208,39 @@ void shell_printf(const char *str, ...){
         // Starts the transmission and returns before all the bytes have physically been transmitted.
         HAL_UART_Transmit(&huart2,(uint8_t *)uart_tx_buffer, (uint16_t) len,100);
     }
+
+}
+
+
+/**
+  * @brief Print current system status
+  * @retval none
+  */
+void print_status(void){
+
+
+	char *card_type =  sd_block_addressing ? "SDHC/SDXC": "SDSC";  	// Card type
+	char *block_addressing = sd_block_addressing ? "block address (x1)"
+			: "byte address (x512)"; // Block addressing
+
+    if (sd_initialized) {
+    	shell_printf("\r\nCard type: %s\r\n", card_type);
+		shell_printf("Block addressinge: %s\r\n", block_addressing);
+    }
+    else {
+    	shell_printf("SD card has not been successfully intialized\r\n");
+    }
+
+	// Number oflocks written
+	shell_printf("Number of blocks written this session: %u\r\n", blocks_written);
+
+	// Next block
+	shell_printf("Next block written: %u\r\n", sd_next_block);
+
+	// Logging status
+	char *logging_status = pause_sd_logging ? "paused" : "running";
+	shell_printf("Logging status: %s\r\n", logging_status);
+
 
 }
 

@@ -49,13 +49,13 @@ mpu_status_t mpu6050_init(void){
 
 	}
 
-	// Wake sensor up ans set clock.
+	/* Wake sensor up ans set clock. */
 	uint8_t pwr = 0x01; 	// Sleep = 0.  CLKSEL = 0x01 -> set PLL with X-axis gyroscope reference.
 	if (HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDR << 1, MPU6050_PWR_MGMT_1_REG, I2C_MEMADD_SIZE_8BIT, &pwr, 1, 1000)!= HAL_OK) {
 		return MPU_ERROR_PWR_MGMT;
 	}
 
-	// Sample Rate = Gyroscope Output Rate / (1 + SMPLRT_DIV)
+	/* Sample Rate = Gyroscope Output Rate / (1 + SMPLRT_DIV) */
 	uint8_t config = 0x03;       // Select output rate as 1 kHz. DLPF_CFG = 3
 	uint8_t sample_div = 199;      // 1 kHz / (1 + 199) = 5Hz
 	if (HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDR << 1, MPU6050_CONFIG_REG, I2C_MEMADD_SIZE_8BIT, &config,  1, 100) != HAL_OK){
@@ -66,7 +66,7 @@ mpu_status_t mpu6050_init(void){
 		return MPU_ERROR_SMPLRT_DIV;
 	}
 
-	// Config gyro range.
+	/* Config gyro range. */
 	uint8_t gyro_cfg = (0 << 3);   // FS_SEL=0 -> ±250 °/s
 
 	if (HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDR << 1, MPU6050_GYRO_CONFIG_REG, I2C_MEMADD_SIZE_8BIT, &gyro_cfg, 1, 100) != HAL_OK){
@@ -74,7 +74,7 @@ mpu_status_t mpu6050_init(void){
 	}
 	 shell_printf("Gyro range set at ±250 °/s\r\n");
 
-	// Config acceleration range.
+	/* Config acceleration range. */
 	uint8_t accel_cfg = (0 << 3);  // AFS_SEL=0 -> ±2 g
 	if (HAL_I2C_Mem_Write(&hi2c1, MPU6050_ADDR << 1, MPU6050_ACCEL_CONFIG_REG, I2C_MEMADD_SIZE_8BIT, &accel_cfg, 1, 100) != HAL_OK){
 		return MPU_ERROR_AFS_SEL;

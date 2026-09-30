@@ -40,5 +40,8 @@ void shell_printf(const char *msg, ...);		// ... is ellipsis. variadic function 
 void UART_Recieve_Start(void);
 void shell_poll(void);
 void shell_execute(char *msg);
-int parse_int(char *str, uint32_t *val);
+int  parse_int(char *str, uint32_t *val);
+void decode_print_sd_rx_block(uint8_t *read_buffer);
+void print_status(void);
+
 #endif

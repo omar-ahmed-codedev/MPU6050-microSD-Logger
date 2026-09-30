@@ -144,7 +144,7 @@ int main(void)
 	  }
 
 	  /* Save received frame bytes in buffer */
-	  if (i2c_frame_ready && !sd_buffer_log_flag){
+	  if (i2c_frame_ready && !sd_buffer_log_flag && !pause_sd_logging){
 		  if(indx <= MPU_LOG_DATA_SIZE-I2C_RX_FRAME_SIZE){
 			 for (uint8_t i = 0; i < I2C_RX_FRAME_SIZE; i++){
 				  mpu_log_buffer[indx++] = i2c_rx_buffer[i];
@@ -156,13 +156,13 @@ int main(void)
 				 mpu_log_buffer[i] = 0xFF;
 			  }
 			  sd_buffer_log_flag = 1;		// Flag SD writing
-			  shell_printf("Sensor log data ready.\r\n");
+			  shell_printf("\r\nSensor log data ready.\r\n");
 
 		  }
 	  }
 
 	  /* Fill write buffer when log buffer is full */
-	  if (sd_buffer_log_flag && !sd_write_flag){
+	  if (sd_buffer_log_flag && !sd_write_flag && !pause_sd_logging){
 		  for (uint16_t i = 0; i<LOG_BUFFER_SIZE; i++){
 		  sd_write_buffer[i]=mpu_log_buffer[i];
 		  }
@@ -188,7 +188,8 @@ int main(void)
 
 		  if(result == SD_OK){
 			  sd_write_flag = 0;
-			  shell_printf("\r\nData block written in card.\r\n");
+			  sd_write_in_progress = 0;
+			  shell_printf("Data block written in card.\r\n");
 		  }
 		  else if (result != SD_BUSY){
 			  sd_write_failed = 1;
