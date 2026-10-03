@@ -1,16 +1,13 @@
 /**
   ******************************************************************************
-  * @file           : mpu6050.c
-  * @brief          :
+  * @file      mpu6050.c
+  * @brief     MPU6050 initialization, sampling, and live data display.
+  * @author	   Omar Ahmed
   ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
+  * @details   Configures sensor settings, and receives
+  *            14-byte measurement frames through I2C DMA. Handles I2C callbacks
+  *            and converts raw readings to acceleration, angular velocity,
+  *            and temperature for terminal output.
   *
   ******************************************************************************
   */

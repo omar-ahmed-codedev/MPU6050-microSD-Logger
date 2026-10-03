@@ -1,18 +1,13 @@
 /**
   ******************************************************************************
-  * @file           : mpu.h
-  * @brief          :
-  ******************************************************************************
-  * @attention
+  * @file		mpu.h
+  * @brief		Public interface and register definitions for the MPU6050
+  * @author		Omar Ahmed
+  *******************************************************************************
+  * @details	Defines the sensor address, registers, frame size, logging buffer layout
+  * 			and initialization status code. Declares shared sensor buffers, flags, functions.
   *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
+  *******************************************************************************
   */
 #ifndef MPU6050_H
 #define MPU6050_H

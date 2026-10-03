@@ -2,7 +2,14 @@
  ******************************************************************************
  * @file    peripheral_config.h
  * @author  Omar Ahmed
- * @brief   Peripheral initialization function declarations
+ * @brief   Header for peripheral initialization function declarations
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2026 STMicroelectronics.
+ * All rights reserved.
+ *
+ *
  ******************************************************************************
  */
 

@@ -1,9 +1,14 @@
 /**
   ******************************************************************************
-  * @file           : sd.c
-  * @brief          :
+  * @file       sd.c
+  * @brief      mciroSD driver
+  * @author		Omar Ahmed
   ******************************************************************************
-  * @details
+  * @details 	Initializes the card, handles byte or block addressing, and reads
+  *          	and writes 512-byte blocks. Separates read requests and write
+  *          	initiation from completion polling. Tracks logging progress and
+  *          	clears the current session's logs by overwriting them with zeros.
+  *
   *
   ******************************************************************************
   */

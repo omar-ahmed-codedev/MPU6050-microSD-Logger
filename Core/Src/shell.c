@@ -1,16 +1,14 @@
 /**
   ******************************************************************************
-  * @file           : shell.c
-  * @brief          :
+  * @file      shell.c
+  * @brief     UART command shell and formatted terminal output.
+  * @author		Omar Ahmed
   ******************************************************************************
-  * @attention
+  * @details   Receives commands through UART DMA and processes help, status,
+  *            block reading, logging control, live display, and clearing commands.
+  *            Decodes stored sensor frames into values with units and transmits
+  *            formatted messages using blocking UART transfers.
   *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */

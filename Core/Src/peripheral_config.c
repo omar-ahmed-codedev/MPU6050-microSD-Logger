@@ -3,7 +3,11 @@
   * @file           : peripheral_config.c
   * @brief          : Peripheral initialization and configuration
   ******************************************************************************
-  */
+  * @attention
+  *
+  * Copyright (c) 2026 STMicroelectronics.
+  * All rights reserved.
+  ******************************************************************************  */
 
 /* Includes ------------------------------------------------------------------*/
 #include "peripheral_config.h"

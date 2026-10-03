@@ -1,16 +1,13 @@
 /**
   ******************************************************************************
-  * @file           : shell.h
-  * @brief          :
+  * @file       shell.h
+  * @brief      Public interface for the UART command shell.
+  * @author		Omar Ahmed
   ******************************************************************************
-  * @attention
+  * @details 	Defines UART buffer and command length limits. Declares shared
+  *          	shell state and functions for command reception, parsing,
+  *          	formatted output, status display, and stored sensor data decoding.
   *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */

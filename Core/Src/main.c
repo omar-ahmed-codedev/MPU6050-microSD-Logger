@@ -1,9 +1,15 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
+  * @file     main.c
+  * @brief    Main application for the MPU6050 microSD logger.
+  * @author		Omar Ahmed
   ******************************************************************************
+  * @details  Initializes peripherals and devices, handles timer-driven sampling,
+  *           and coordinates sensor buffering, SD operations, and shell commands.
+  *           Packs 36 sensor frames into each 512-byte block, with eight padding
+  *           bytes set to 0xFF.
+  *
   * @attention
   *
   * Copyright (c) 2026 STMicroelectronics.

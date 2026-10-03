@@ -1,10 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * @file       main.h
+  * @brief      Application header for the MPU6050 microSD logger.
+  * @author		Omar Ahmed
   ******************************************************************************
+  * @details    Provides the STM32 HAL include, SD chip-select pin definitions,
+  *          	and the application error-handler declaration.
+  *
   * @attention
   *
   * Copyright (c) 2026 STMicroelectronics.
