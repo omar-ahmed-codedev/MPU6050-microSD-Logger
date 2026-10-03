@@ -137,6 +137,12 @@ int main(void)
 	  	  shell_poll();
 	  }
 
+	  /* Display live mpu6050 decoded readings*/
+	  if (display_live_mpu) {
+		  convert_display_live_sensor();
+	  }
+
+
 	  /* Sample MPU6050 every 1000ms */
 	  if (i2c_sample_flag && !sd_buffer_log_flag && !i2c_frame_ready){
 		 mpu6050_sample();

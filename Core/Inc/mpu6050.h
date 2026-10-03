@@ -51,6 +51,8 @@ extern uint16_t indx;
 extern volatile uint32_t i2c_overrun_count;
 extern uint8_t start_timer;
 
+extern uint8_t display_live_mpu;
+
 
 typedef enum {
 	MPU_OK = 0,
@@ -68,7 +70,7 @@ typedef enum {
 /* Functions ------------------------------------------------------------------*/
 void mpu6050_sample(void);
 mpu_status_t mpu6050_init(void);
-void convert_display_live_mpu6050(void);
+void convert_display_live_sensor(void);
 void decode_print_sd_rx_block(uint8_t *read_buffer);
 
 

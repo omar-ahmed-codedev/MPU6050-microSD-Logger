@@ -114,6 +114,8 @@ void shell_execute(char *msg){
 		shell_printf("%-24sstart block: %u\r\n", "",SD_START_BLOCK);
 		shell_printf("%-24s%s\r\n", "pause sensor logging:", "pauses logging in sd");
 		shell_printf("%-24s%s\r\n", "resume sensor logging:", "resumes logging in sd");
+		shell_printf("%-24s%s\r\n", "display live sensor:", "displayes live decoded sensor readings");
+		shell_printf("%-24s%s\r\n", "pause live sensor:", "pauses live sensor display");
 		shell_printf("%-24s%s\r\n", "clear sd:", "clears logged data in sd and resets logging buffers");
 
 	}	// Print a specefic block
@@ -148,7 +150,14 @@ void shell_execute(char *msg){
 	else if(strncmp(msg, "status", 6) == 0){
 		print_status();
 	}
-
+	else if (strncmp(msg, "display live sensor", 19) == 0){
+		display_live_mpu = 1;
+		shell_printf("Live sensor readings displaying...\r\n");
+	}
+	else if (strncmp(msg, "pause live sensor", 17) == 0){
+			display_live_mpu = 0;
+			shell_printf("Live sensor display paused\r\n");
+	}
 	else{
 		shell_printf("Error: unknown command!\r\n\r\n");
 	}

@@ -36,6 +36,8 @@ int count;
 int count2;
 uint8_t start_timer = 0;
 
+uint8_t display_live_mpu = 0;
+
 /**
 * @brief mpu6050 initialization
 * @retval None
@@ -101,7 +103,7 @@ void mpu6050_sample(void){
 * @brief Print latest mpu6050readings
 * @retval None
 */
-void convert_display_live_mpu6050(void){
+void convert_display_live_sensor(void){
 
 	// Combine raw values
 	int16_t accel_x = (int16_t)((i2c_rx_buffer[0]  << 8) | i2c_rx_buffer[1]);
@@ -127,11 +129,11 @@ void convert_display_live_mpu6050(void){
 	float temp_c = temp / 340.0f + 36.53f;
 
 	// Display live values
-	shell_printf("accel_x=%6.3f g   accel_y=%6.3f g   accel_z=%6.3f g\r\n",
+	shell_printf("\r\n\r\naccel_x=%6.3f g   accel_y=%6.3f g   accel_z=%6.3f g\r\n",
 				ax_g, ay_g, az_g);
 	shell_printf("gyro_x =%7.2f dps  gyro_y =%7.2f dps  gyro_z =%7.2f dps\r\n",
 				gx_dps, gy_dps, gz_dps);
-	shell_printf("temp   =%5.1f C\r\n", temp_c);
+	shell_printf("temp   =%5.1f C\r\n\r\n", temp_c);
 
 
 }
