@@ -60,5 +60,7 @@ sd_status_t sd_write_block(uint8_t *buf);
 sd_status_t sd_write_poll(void);
 sd_status_t sd_request_block(uint32_t block);
 sd_status_t sd_read_block(void);
+sd_status_t clear_sd();
+char *error_str(sd_status_t res);
 
 #endif

@@ -101,17 +101,20 @@ void shell_poll(void){
 void shell_execute(char *msg){
 
 	uint32_t block = 0;		// stroul return unsigned long, which is 32 bits on ARM32 M4
+	sd_status_t result = 0;
 
 	// Check msg
 	// help
 	if(strncmp(msg, "help",4) == 0){
-		shell_printf("\r\n"
-					"read block <block number, start from 100000>\tPrint MPU6050 data stored in that block\r\n"
-					"pause sensor logging in sd\r\n"
-					"resume sensor logging in sd\r\n"
-					"help\r\n\r\n",
-					SD_START_BLOCK,
-					sd_next_block-1);
+		shell_printf("\r\n");
+		// Pad the string with spaces from the right to align the text
+		shell_printf("%-24s%s\r\n", "help:", "this text");
+		shell_printf("%-24s%s\r\n", "status:", "prints current SD card type and logging information");
+		shell_printf("%-24s%s\r\n", "read block <number>:", "prints decoded MPU6050 data stored in that block,");
+		shell_printf("%-24sstart block: %u\r\n", "",SD_START_BLOCK);
+		shell_printf("%-24s%s\r\n", "pause sensor logging:", "pauses logging in sd");
+		shell_printf("%-24s%s\r\n", "resume sensor logging:", "resumes logging in sd");
+		shell_printf("%-24s%s\r\n", "clear sd:", "clears logged data in sd and resets logging buffers");
 
 	}	// Print a specefic block
 	else if (strncmp(msg, "read block", 10) == 0){
@@ -126,9 +129,13 @@ void shell_execute(char *msg){
 			sd_rx_block = block;
 			sd_read_failed = 0;
 			sd_read_flag = 1;
-
 		}
-
+	}
+	else if (strncmp(msg, "clear sd", 8) == 0){
+		result = clear_sd();
+		shell_printf("\r\nClearing sd...\r\n");
+		if (result == SD_OK){ shell_printf("SD cleared and logging buffers reset. \r\n"); }
+		else { shell_printf("Error sd_not cleared: error %s \r\n", error_str(result)); }
 	}
 	else if (strncmp(msg, "pause sensor logging", 20) == 0){
 		pause_sd_logging = 1;
@@ -141,6 +148,7 @@ void shell_execute(char *msg){
 	else if(strncmp(msg, "status", 6) == 0){
 		print_status();
 	}
+
 	else{
 		shell_printf("Error: unknown command!\r\n\r\n");
 	}
@@ -299,6 +307,9 @@ void decode_print_sd_rx_block(uint8_t *read_buffer){
 
 	}
 }
+
+
+
 
 /**
 * @brief Clear overflow flag when it occurs

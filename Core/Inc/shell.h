@@ -24,8 +24,8 @@
 
 /* Defines ------------------------------------------------------------------*/
 #define UART_RX_BUFFER_SIZE	64
-#define UART_TX_BUFFER_SIZE	256
-#define MSG_LEN_MAX				64
+#define UART_TX_BUFFER_SIZE	512
+#define MSG_LEN_MAX			64
 
 /* Variables ---------------------------------------------------------*/
 extern UART_HandleTypeDef huart2;
